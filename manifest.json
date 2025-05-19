@@ -2,11 +2,13 @@
   "name": "Personal Budget Tracker",
   "short_name": "BudgetApp",
   "start_url": "/",
+  "id": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1976d2",
   "orientation": "portrait",
   "scope": "/",
+  "description": "A simple and effective personal budget tracker for managing daily expenses.",
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
