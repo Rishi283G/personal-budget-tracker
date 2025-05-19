@@ -102,3 +102,39 @@
     focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50;
   }
 }
+/* index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+  --primary: 222 89% 53%;
+  --primary-foreground: 210 40% 98%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 20% 50%;
+  --border: 210 40% 90%;
+  --input: 210 40% 90%;
+  --ring: 222 89% 53%;
+
+  /* Add more if needed */
+}
+
+.dark {
+  --background: 222 47% 11%;
+  --foreground: 0 0% 100%;
+  --primary: 210 100% 66%;
+  --primary-foreground: 222 47% 11%;
+  --card: 222 47% 16%;
+  --card-foreground: 0 0% 100%;
+  --muted: 215 20% 22%;
+  --muted-foreground: 215 20% 80%;
+  --border: 215 20% 40%;
+  --input: 215 20% 40%;
+  --ring: 210 100% 66%;
+}
+
+

@@ -7,7 +7,7 @@ import ExpenseForm from "@/components/ExpenseForm";
 const DashboardPage: React.FC = () => {
   return (
     <div className="container max-w-5xl py-4 md:py-8 space-y-6">
-      <h1 className="text-2xl font-bold mb-6">Food Budget Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-6">Personal Budget Dashboard</h1>
       
       <Dashboard />
       
