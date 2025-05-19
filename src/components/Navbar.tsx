@@ -3,12 +3,13 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { useLocation, Link } from "react-router-dom";
 import { BarChart, Calendar, FileText } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
 
 const Navbar: React.FC = () => {
   const location = useLocation();
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md z-10 md:relative md:border-b md:border-t-0 md:shadow-sm">
+    <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-md z-10 md:relative md:border-b md:border-t-0 md:shadow-sm">
       <div className="container max-w-5xl">
         <div className="flex justify-around md:justify-between py-2 items-center">
           <div className="hidden md:block">
@@ -51,6 +52,10 @@ const Navbar: React.FC = () => {
                 <span className="md:hidden">Reports</span>
               </Button>
             </Link>
+
+            <div className="hidden md:block ml-4">
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </div>
