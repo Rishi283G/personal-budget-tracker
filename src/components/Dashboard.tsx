@@ -13,7 +13,7 @@ const Dashboard: React.FC = () => {
   const percentSpent = Math.round(((budget - remainingBudget) / budget) * 100);
   const daysLeft = Math.ceil((endDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
   
-  // Calculate if today is over/under budget
+  // Calculate if today is over/under budgezt
   const dailyStatus = todaySpent > dailyAllowance ? 
     { status: "over", icon: <ArrowUp className="text-budget-warning" />, color: "text-budget-warning" } :
     { status: "under", icon: <ArrowDown className="text-budget-success" />, color: "text-budget-success" };
