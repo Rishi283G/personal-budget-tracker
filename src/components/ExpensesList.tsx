@@ -1,19 +1,18 @@
-
 import React from "react";
 import { useBudget, Expense } from "@/contexts/BudgetContext";
 import { format } from "date-fns";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Food, Coffee, Category } from "lucide-react";
+import { UtensilsCrossed, Coffee, Tag } from "lucide-react";
 
 const getCategoryIcon = (category: string) => {
   switch (category.toLowerCase()) {
     case "food":
-      return <Food className="w-4 h-4" />;
+      return <UtensilsCrossed className="w-4 h-4" />;
     case "tea":
       return <Coffee className="w-4 h-4" />;
     default:
-      return <Category className="w-4 h-4" />;
+      return <Tag className="w-4 h-4" />;
   }
 };
 
