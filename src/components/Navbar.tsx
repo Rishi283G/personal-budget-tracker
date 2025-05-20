@@ -13,7 +13,7 @@ const Navbar: React.FC = () => {
       <div className="container max-w-5xl">
         <div className="flex justify-around md:justify-between py-2 items-center">
           <div className="hidden md:block">
-            <h1 className="text-xl font-bold text-budget-primary">Personal Budget Tracker</h1>
+            <h1 className="text-xl font-bold text-budget-primary">RupeeWise</h1>
           </div>
           
           <div className="flex items-center gap-1 md:gap-2">
@@ -23,9 +23,8 @@ const Navbar: React.FC = () => {
                 className={location.pathname === "/" ? "bg-budget-primary text-white hover:bg-budget-primary/90" : ""} 
                 size="sm"
               >
-                <BarChart className="w-4 h-4 mr-1 md:mr-2" />
+                <BarChart className="w-4 h-4 md:mr-2" />
                 <span className="hidden md:inline">Dashboard</span>
-                <span className="md:hidden">Home</span>
               </Button>
             </Link>
             
@@ -35,9 +34,8 @@ const Navbar: React.FC = () => {
                 className={location.pathname === "/expenses" ? "bg-budget-primary text-white hover:bg-budget-primary/90" : ""} 
                 size="sm"
               >
-                <Calendar className="w-4 h-4 mr-1 md:mr-2" />
+                <Calendar className="w-4 h-4 md:mr-2" />
                 <span className="hidden md:inline">Expenses</span>
-                <span className="md:hidden">Log</span>
               </Button>
             </Link>
             
@@ -47,9 +45,8 @@ const Navbar: React.FC = () => {
                 className={location.pathname === "/reports" ? "bg-budget-primary text-white hover:bg-budget-primary/90" : ""} 
                 size="sm"
               >
-                <FileText className="w-4 h-4 mr-1 md:mr-2" />
+                <FileText className="w-4 h-4 md:mr-2" />
                 <span className="hidden md:inline">Reports</span>
-                <span className="md:hidden">Reports</span>
               </Button>
             </Link>
 

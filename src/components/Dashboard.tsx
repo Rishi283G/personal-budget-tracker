@@ -67,7 +67,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row gap-4">
+      <div className="grid grid-cols-1 md:flex md:flex-row gap-4">
         <Card className="budget-card flex-1">
           <h3 className="text-lg font-medium text-muted-foreground mb-2">Total Budget</h3>
           <div className="text-3xl font-bold">₹{budget.toLocaleString()}</div>
