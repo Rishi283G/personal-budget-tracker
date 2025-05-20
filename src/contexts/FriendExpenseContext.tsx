@@ -29,6 +29,7 @@ interface FriendExpenseContextType {
   settleBalance: (friendId: string) => void;
   deleteFriend: (id: string) => void;
   deleteTransaction: (id: string) => void;
+  updateFriendName: (id: string, newName: string) => void;
 }
 
 const FriendExpenseContext = createContext<FriendExpenseContextType | undefined>(undefined);
@@ -73,6 +74,14 @@ export const FriendExpenseProvider: React.FC<{ children: React.ReactNode }> = ({
       name,
     };
     setFriends([...friends, newFriend]);
+  };
+
+  // Update a friend's name
+  const updateFriendName = (id: string, newName: string) => {
+    if (!newName.trim()) return;
+    setFriends(friends.map(friend => 
+      friend.id === id ? { ...friend, name: newName.trim() } : friend
+    ));
   };
 
   // Add a new transaction
@@ -149,6 +158,7 @@ export const FriendExpenseProvider: React.FC<{ children: React.ReactNode }> = ({
     settleBalance,
     deleteFriend,
     deleteTransaction,
+    updateFriendName,
   };
 
   return (

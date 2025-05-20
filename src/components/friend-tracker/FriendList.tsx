@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useFriendExpense, Friend } from "@/contexts/FriendExpenseContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { UserPlus, X, Check, Trash } from "lucide-react";
+import { UserPlus, X, Check, Trash, Edit } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   AlertDialog,
@@ -23,10 +23,12 @@ interface FriendListProps {
 }
 
 const FriendList: React.FC<FriendListProps> = ({ selectedFriendId, onSelectFriend }) => {
-  const { friends, addFriend, calculateBalance, deleteFriend } = useFriendExpense();
+  const { friends, addFriend, calculateBalance, deleteFriend, updateFriendName } = useFriendExpense();
   const [newFriendName, setNewFriendName] = useState("");
   const [isAddingFriend, setIsAddingFriend] = useState(false);
   const [friendToDelete, setFriendToDelete] = useState<Friend | null>(null);
+  const [editingFriendId, setEditingFriendId] = useState<string | null>(null);
+  const [editedName, setEditedName] = useState("");
 
   const handleAddFriend = () => {
     if (newFriendName.trim()) {
@@ -53,6 +55,28 @@ const FriendList: React.FC<FriendListProps> = ({ selectedFriendId, onSelectFrien
       });
       setFriendToDelete(null);
     }
+  };
+
+  const startEditingFriend = (friend: Friend) => {
+    setEditingFriendId(friend.id);
+    setEditedName(friend.name);
+  };
+
+  const saveEditedFriend = () => {
+    if (editingFriendId && editedName.trim()) {
+      updateFriendName(editingFriendId, editedName.trim());
+      toast({
+        title: "Friend updated",
+        description: `Friend name has been updated successfully.`
+      });
+      setEditingFriendId(null);
+      setEditedName("");
+    }
+  };
+
+  const cancelEditingFriend = () => {
+    setEditingFriendId(null);
+    setEditedName("");
   };
 
   const formatBalance = (balance: number) => {
@@ -112,6 +136,8 @@ const FriendList: React.FC<FriendListProps> = ({ selectedFriendId, onSelectFrien
           ) : (
             friends.map((friend) => {
               const balance = calculateBalance(friend.id);
+              const isEditing = editingFriendId === friend.id;
+
               return (
                 <div 
                   key={friend.id} 
@@ -120,35 +146,81 @@ const FriendList: React.FC<FriendListProps> = ({ selectedFriendId, onSelectFrien
                       ? 'bg-budget-primary text-white' 
                       : 'hover:bg-accent'
                   }`}
-                  onClick={() => onSelectFriend(friend.id)}
+                  onClick={() => !isEditing && onSelectFriend(friend.id)}
                 >
-                  <div>
-                    <div className="font-medium">{friend.name}</div>
-                    <div className={`text-xs ${
-                      selectedFriendId === friend.id 
-                        ? 'text-white/80' 
-                        : balance > 0 
-                          ? 'text-budget-success' 
-                          : balance < 0 
-                            ? 'text-budget-warning' 
-                            : 'text-muted-foreground'
-                    }`}>
-                      {formatBalance(balance)}
-                    </div>
+                  <div className="flex-grow">
+                    {isEditing ? (
+                      <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
+                        <Input
+                          value={editedName}
+                          onChange={(e) => setEditedName(e.target.value)}
+                          className="h-8 py-1"
+                          autoFocus
+                        />
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-7 w-7" 
+                          onClick={cancelEditingFriend}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button 
+                          size="icon" 
+                          className="h-7 w-7" 
+                          onClick={saveEditedFriend}
+                          disabled={!editedName.trim()}
+                        >
+                          <Check className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="font-medium">{friend.name}</div>
+                        <div className={`text-xs ${
+                          selectedFriendId === friend.id 
+                            ? 'text-white/80' 
+                            : balance > 0 
+                              ? 'text-budget-success' 
+                              : balance < 0 
+                                ? 'text-budget-warning' 
+                                : 'text-muted-foreground'
+                        }`}>
+                          {formatBalance(balance)}
+                        </div>
+                      </>
+                    )}
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className={`opacity-0 group-hover:opacity-100 hover:opacity-100 ${
-                      selectedFriendId === friend.id ? 'text-white hover:bg-white/20' : ''
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setFriendToDelete(friend);
-                    }}
-                  >
-                    <Trash className="h-4 w-4" />
-                  </Button>
+                  {!isEditing && (
+                    <div className="flex space-x-1">
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className={`opacity-0 hover:opacity-100 ${
+                          selectedFriendId === friend.id ? 'text-white hover:bg-white/20' : ''
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          startEditingFriend(friend);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className={`opacity-0 hover:opacity-100 ${
+                          selectedFriendId === friend.id ? 'text-white hover:bg-white/20' : ''
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFriendToDelete(friend);
+                        }}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               );
             })
