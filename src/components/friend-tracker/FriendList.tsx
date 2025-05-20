@@ -196,9 +196,7 @@ const FriendList: React.FC<FriendListProps> = ({ selectedFriendId, onSelectFrien
                       <Button 
                         variant="ghost" 
                         size="icon"
-                        className={`opacity-0 hover:opacity-100 ${
-                          selectedFriendId === friend.id ? 'text-white hover:bg-white/20' : ''
-                        }`}
+                        className={`${selectedFriendId === friend.id ? 'text-white hover:bg-white/20' : ''}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           startEditingFriend(friend);
@@ -209,9 +207,7 @@ const FriendList: React.FC<FriendListProps> = ({ selectedFriendId, onSelectFrien
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className={`opacity-0 hover:opacity-100 ${
-                          selectedFriendId === friend.id ? 'text-white hover:bg-white/20' : ''
-                        }`}
+                        className={`${selectedFriendId === friend.id ? 'text-white hover:bg-white/20' : ''}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           setFriendToDelete(friend);
