@@ -13,7 +13,7 @@ const Navbar: React.FC = () => {
       <div className="container max-w-5xl">
         <div className="flex justify-around md:justify-between py-2 items-center">
           <div className="hidden md:block">
-            <h1 className="text-xl font-bold text-budget-primary">RupeeWise</h1>
+            <h1 className="text-xl font-bold text-budget-primary">BudgetBuddy</h1>
           </div>
           
           <div className="flex items-center gap-1 md:gap-2">
