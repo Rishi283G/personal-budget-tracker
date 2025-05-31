@@ -24,6 +24,12 @@ interface BudgetContextType {
   dailyAllowance: number;
   todaySpent: number;
   resetBudget: () => void;
+  // New dynamic metrics
+  averageDailySpending: number;
+  projectedMonthlySpending: number;
+  budgetHealthStatus: "excellent" | "good" | "warning" | "critical";
+  daysUntilBudgetExhausted: number;
+  spendingTrend: "increasing" | "decreasing" | "stable";
 }
 
 const defaultStartDate = new Date();
@@ -67,6 +73,64 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const todaySpent = expenses
     .filter(expense => expense.date === todayFormatted)
     .reduce((total, expense) => total + expense.amount, 0);
+
+  // Calculate total days in budget period
+  const totalDays = Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+  
+  // Calculate days passed since start date
+  const daysPassed = Math.max(1, Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+  
+  // Calculate average daily spending
+  const totalSpent = budget - remainingBudget;
+  const averageDailySpending = daysPassed > 0 ? totalSpent / daysPassed : 0;
+  
+  // Calculate projected monthly spending
+  const projectedMonthlySpending = averageDailySpending * totalDays;
+  
+  // Calculate budget health status
+  const budgetUsedPercentage = (totalSpent / budget) * 100;
+  const timePassedPercentage = (daysPassed / totalDays) * 100;
+  
+  let budgetHealthStatus: "excellent" | "good" | "warning" | "critical" = "excellent";
+  
+  if (budgetUsedPercentage > timePassedPercentage + 20) {
+    budgetHealthStatus = "critical";
+  } else if (budgetUsedPercentage > timePassedPercentage + 10) {
+    budgetHealthStatus = "warning";
+  } else if (budgetUsedPercentage > timePassedPercentage) {
+    budgetHealthStatus = "good";
+  }
+  
+  // Calculate days until budget exhausted at current rate
+  const daysUntilBudgetExhausted = averageDailySpending > 0 ? Math.floor(remainingBudget / averageDailySpending) : remainingDays;
+  
+  // Calculate spending trend (last 7 days vs previous 7 days)
+  const last7DaysStart = new Date();
+  last7DaysStart.setDate(last7DaysStart.getDate() - 7);
+  const last14DaysStart = new Date();
+  last14DaysStart.setDate(last14DaysStart.getDate() - 14);
+  
+  const last7DaysSpending = expenses
+    .filter(expense => {
+      const expenseDate = new Date(expense.date);
+      return expenseDate >= last7DaysStart && expenseDate <= today;
+    })
+    .reduce((total, expense) => total + expense.amount, 0);
+    
+  const previous7DaysSpending = expenses
+    .filter(expense => {
+      const expenseDate = new Date(expense.date);
+      return expenseDate >= last14DaysStart && expenseDate < last7DaysStart;
+    })
+    .reduce((total, expense) => total + expense.amount, 0);
+  
+  let spendingTrend: "increasing" | "decreasing" | "stable" = "stable";
+  
+  if (last7DaysSpending > previous7DaysSpending * 1.1) {
+    spendingTrend = "increasing";
+  } else if (last7DaysSpending < previous7DaysSpending * 0.9) {
+    spendingTrend = "decreasing";
+  }
 
   // Save to localStorage whenever state changes
   useEffect(() => {
@@ -114,7 +178,12 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         remainingBudget,
         dailyAllowance,
         todaySpent,
-        resetBudget
+        resetBudget,
+        averageDailySpending,
+        projectedMonthlySpending,
+        budgetHealthStatus,
+        daysUntilBudgetExhausted,
+        spendingTrend
       }}
     >
       {children}

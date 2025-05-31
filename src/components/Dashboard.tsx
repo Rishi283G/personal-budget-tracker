@@ -1,14 +1,26 @@
-
 import React from "react";
 import { useBudget } from "@/contexts/BudgetContext";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { format } from "date-fns";
-import { ArrowUp, ArrowDown, Calendar } from "lucide-react";
+import { ArrowUp, ArrowDown, Calendar, TrendingUp, TrendingDown, AlertTriangle, CheckCircle } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 
 const Dashboard: React.FC = () => {
-  const { budget, remainingBudget, dailyAllowance, expenses, todaySpent, startDate, endDate } = useBudget();
+  const { 
+    budget, 
+    remainingBudget, 
+    dailyAllowance, 
+    expenses, 
+    todaySpent, 
+    startDate, 
+    endDate,
+    averageDailySpending,
+    projectedMonthlySpending,
+    budgetHealthStatus,
+    daysUntilBudgetExhausted,
+    spendingTrend
+  } = useBudget();
   
   const percentSpent = Math.round(((budget - remainingBudget) / budget) * 100);
   const today = new Date();
@@ -18,6 +30,36 @@ const Dashboard: React.FC = () => {
   const dailyStatus = todaySpent > dailyAllowance ? 
     { status: "over", icon: <ArrowUp className="text-budget-warning" />, color: "text-budget-warning" } :
     { status: "under", icon: <ArrowDown className="text-budget-success" />, color: "text-budget-success" };
+
+  // Get health status color and icon
+  const getHealthStatusDisplay = () => {
+    switch (budgetHealthStatus) {
+      case "excellent":
+        return { color: "text-budget-success", icon: <CheckCircle className="w-4 h-4" />, text: "Excellent" };
+      case "good":
+        return { color: "text-blue-500", icon: <CheckCircle className="w-4 h-4" />, text: "Good" };
+      case "warning":
+        return { color: "text-yellow-500", icon: <AlertTriangle className="w-4 h-4" />, text: "Warning" };
+      case "critical":
+        return { color: "text-budget-warning", icon: <AlertTriangle className="w-4 h-4" />, text: "Critical" };
+    }
+  };
+
+  const healthDisplay = getHealthStatusDisplay();
+
+  // Get spending trend display
+  const getTrendDisplay = () => {
+    switch (spendingTrend) {
+      case "increasing":
+        return { color: "text-budget-warning", icon: <TrendingUp className="w-4 h-4" />, text: "Increasing" };
+      case "decreasing":
+        return { color: "text-budget-success", icon: <TrendingDown className="w-4 h-4" />, text: "Decreasing" };
+      case "stable":
+        return { color: "text-muted-foreground", icon: <TrendingUp className="w-4 h-4" />, text: "Stable" };
+    }
+  };
+
+  const trendDisplay = getTrendDisplay();
 
   // Get category data for pie chart
   const categoryData = expenses.reduce((acc: Record<string, number>, expense) => {
@@ -68,6 +110,23 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Budget Health Alert */}
+      {(budgetHealthStatus === "warning" || budgetHealthStatus === "critical") && (
+        <Card className="budget-card border-yellow-200 bg-yellow-50">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-yellow-600" />
+            <div>
+              <h4 className="font-medium text-yellow-800">Budget Alert</h4>
+              <p className="text-sm text-yellow-700">
+                {budgetHealthStatus === "critical" 
+                  ? "You're spending faster than planned. Consider reducing expenses."
+                  : "Your spending is slightly above the ideal pace. Monitor your expenses."}
+              </p>
+            </div>
+          </div>
+        </Card>
+      )}
+
       <div className="grid grid-cols-1 md:flex md:flex-row gap-4">
         <Card className="budget-card flex-1">
           <h3 className="text-lg font-medium text-muted-foreground mb-2">Total Budget</h3>
@@ -99,6 +158,99 @@ const Dashboard: React.FC = () => {
           </div>
         </Card>
       </div>
+
+      {/* Dynamic Insights Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="budget-card">
+          <h3 className="text-lg font-medium text-muted-foreground mb-2">Budget Health</h3>
+          <div className="flex items-center gap-2">
+            {healthDisplay.icon}
+            <span className={`text-xl font-bold ${healthDisplay.color}`}>
+              {healthDisplay.text}
+            </span>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">
+            Based on spending pace vs time passed
+          </p>
+        </Card>
+
+        <Card className="budget-card">
+          <h3 className="text-lg font-medium text-muted-foreground mb-2">Spending Trend</h3>
+          <div className="flex items-center gap-2">
+            {trendDisplay.icon}
+            <span className={`text-xl font-bold ${trendDisplay.color}`}>
+              {trendDisplay.text}
+            </span>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">
+            Last 7 days vs previous 7 days
+          </p>
+        </Card>
+
+        <Card className="budget-card">
+          <h3 className="text-lg font-medium text-muted-foreground mb-2">Budget Runway</h3>
+          <div className="text-2xl font-bold">
+            {daysUntilBudgetExhausted > remainingDays ? `${remainingDays}` : `${daysUntilBudgetExhausted}`} days
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">
+            {daysUntilBudgetExhausted > remainingDays 
+              ? "Budget will last until end date"
+              : "At current spending rate"}
+          </p>
+        </Card>
+      </div>
+
+      {/* Projections Card */}
+      <Card className="budget-card">
+        <h3 className="text-lg font-medium mb-4">Spending Analysis</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-medium text-muted-foreground mb-2">Average Daily Spending</h4>
+              <p className="text-2xl font-bold">₹{Math.round(averageDailySpending).toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground">
+                {averageDailySpending > dailyAllowance 
+                  ? `₹${Math.round(averageDailySpending - dailyAllowance)} above target`
+                  : `₹${Math.round(dailyAllowance - averageDailySpending)} below target`}
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="font-medium text-muted-foreground mb-2">Projected Monthly Total</h4>
+              <p className="text-2xl font-bold">₹{Math.round(projectedMonthlySpending).toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground">
+                {projectedMonthlySpending > budget 
+                  ? `₹${Math.round(projectedMonthlySpending - budget)} over budget`
+                  : `₹${Math.round(budget - projectedMonthlySpending)} under budget`}
+              </p>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <h4 className="font-medium text-muted-foreground mb-2">Quick Tips</h4>
+            {budgetHealthStatus === "critical" && (
+              <p className="text-sm p-2 bg-red-50 text-red-700 rounded">
+                🚨 Consider reducing daily spending by ₹{Math.round(averageDailySpending - dailyAllowance)} to stay on track
+              </p>
+            )}
+            {budgetHealthStatus === "warning" && (
+              <p className="text-sm p-2 bg-yellow-50 text-yellow-700 rounded">
+                ⚠️ Monitor your spending closely to avoid going over budget
+              </p>
+            )}
+            {budgetHealthStatus === "excellent" && (
+              <p className="text-sm p-2 bg-green-50 text-green-700 rounded">
+                ✅ Great job! You're spending within your planned budget
+              </p>
+            )}
+            {spendingTrend === "increasing" && (
+              <p className="text-sm p-2 bg-blue-50 text-blue-700 rounded">
+                📈 Your spending has increased recently. Review your recent expenses
+              </p>
+            )}
+          </div>
+        </div>
+      </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="budget-card">
