@@ -11,9 +11,10 @@ const Dashboard: React.FC = () => {
   const { budget, remainingBudget, dailyAllowance, expenses, todaySpent, startDate, endDate } = useBudget();
   
   const percentSpent = Math.round(((budget - remainingBudget) / budget) * 100);
-  const daysLeft = Math.ceil((endDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+  const today = new Date();
+  const remainingDays = Math.max(1, Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
   
-  // Calculate if today is over/under budgezt
+  // Calculate if today is over/under budget
   const dailyStatus = todaySpent > dailyAllowance ? 
     { status: "over", icon: <ArrowUp className="text-budget-warning" />, color: "text-budget-warning" } :
     { status: "under", icon: <ArrowDown className="text-budget-success" />, color: "text-budget-success" };
@@ -81,12 +82,13 @@ const Dashboard: React.FC = () => {
           <h3 className="text-lg font-medium text-muted-foreground mb-2">Remaining</h3>
           <div className="text-3xl font-bold">₹{remainingBudget.toLocaleString()}</div>
           <Progress className="mt-2" value={percentSpent} />
-          <div className="text-sm text-muted-foreground mt-1">{daysLeft} days left</div>
+          <div className="text-sm text-muted-foreground mt-1">{remainingDays} days left</div>
         </Card>
         
         <Card className="budget-card flex-1">
           <h3 className="text-lg font-medium text-muted-foreground mb-2">Daily Allowance</h3>
           <div className="text-3xl font-bold">₹{Math.round(dailyAllowance).toLocaleString()}</div>
+          <div className="text-xs text-muted-foreground mb-1">Based on remaining budget & days</div>
           <div className="flex items-center mt-1">
             <div className="text-sm">
               Today spent: <span className={dailyStatus.color}>

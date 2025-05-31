@@ -55,16 +55,17 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // Calculate remaining budget
   const remainingBudget = budget - expenses.reduce((total, expense) => total + expense.amount, 0);
   
-  // Calculate days between start and end dates
-  const totalDays = Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+  // Calculate remaining days from today to end date
+  const today = new Date();
+  const remainingDays = Math.max(1, Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
   
-  // Calculate daily allowance
-  const dailyAllowance = budget / totalDays;
+  // Calculate dynamic daily allowance based on remaining budget and remaining days
+  const dailyAllowance = remainingBudget / remainingDays;
   
   // Calculate today's spent amount
-  const today = format(new Date(), "yyyy-MM-dd");
+  const todayFormatted = format(today, "yyyy-MM-dd");
   const todaySpent = expenses
-    .filter(expense => expense.date === today)
+    .filter(expense => expense.date === todayFormatted)
     .reduce((total, expense) => total + expense.amount, 0);
 
   // Save to localStorage whenever state changes
